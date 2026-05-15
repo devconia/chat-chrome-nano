@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gemini Nano Chat</title>
+  <link rel="icon" type="image/svg+xml" href="/public/favicon.svg" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+    <aside id="sidebar" aria-label="Conversaciones">
+      <div class="sidebar-header">
+        <button id="newChatBtn" aria-label="Nueva conversación">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+          </svg>
+          Nueva conversación
+        </button>
+        <button id="settingsBtn" aria-label="Configuración">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-section-label">Conversaciones</div>
+      <div id="convList" role="list" aria-label="Lista de conversaciones"></div>
+
+      <div class="sidebar-footer">
+        <div class="model-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0H3"/>
+          </svg>
+          Gemini Nano · Local
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay para cerrar sidebar en móvil -->
+    <div id="sidebarOverlay" aria-hidden="true"></div>
+
+    <!-- ── Main ────────────────────────────────────────────────────────────── -->
+    <main id="main">
+
+      <!-- Top bar -->
+      <header id="topbar">
+        <button id="sidebarToggleBtn" aria-label="Abrir menú">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+          </svg>
+        </button>
+
+        <button id="newChatBtnMobile" aria-label="Nueva conversación" style="display:none; background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:4px; border-radius:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+          </svg>
+        </button>
+
+        <span class="topbar-title">Gemini Nano</span>
+
+        <div id="statusBar" role="status" aria-live="polite">
+          <div class="status-dot spin" id="statusDot" aria-hidden="true"></div>
+          <span id="statusText">Verificando...</span>
+          <button id="retryBtn" aria-label="Reintentar verificación">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Messages -->
+      <div id="messages" role="log" aria-label="Conversación" aria-live="polite"></div>
+
+      <!-- Input -->
+      <div id="inputArea">
+        <!-- Preview del adjunto (imagen) -->
+        <div id="attachmentPreview"></div>
+
+        <!-- Bubble de voz: aparece tras detener la grabación -->
+        <div id="voiceBubble" role="region" aria-label="Mensaje de voz">
+          <!-- Texto en vivo durante la grabación -->
+          <p id="voiceBubbleLive" class="voice-bubble-live" aria-live="polite"></p>
+          <!-- Texto final transcrito -->
+          <p id="voiceBubbleText" class="voice-bubble-text"></p>
+          <div class="voice-bubble-actions">
+            <button id="voiceBubbleEdit" class="vb-btn vb-edit" title="Editar en el input">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/>
+              </svg>
+              Editar
+            </button>
+            <button id="voiceBubbleSend" class="vb-btn vb-send" title="Enviar mensaje">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405Z"/>
+              </svg>
+              Enviar
+            </button>
+            <button id="voiceBubbleDiscard" class="vb-btn vb-discard" title="Descartar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="input-wrapper">
+          <!-- Botón adjuntar imagen -->
+          <button id="attachImageBtn" class="attach-btn" title="Adjuntar imagen" aria-label="Adjuntar imagen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
+            </svg>
+          </button>
+
+          <!-- Botón micrófono (Web Speech API) -->
+          <button id="voiceBtn" class="attach-btn" title="Dictar mensaje" aria-label="Dictar mensaje" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"/>
+            </svg>
+          </button>
+
+          <!-- Separador visual -->
+          <div class="input-divider" aria-hidden="true"></div>
+
+          <div class="input-text-area">
+            <textarea
+              id="chatInput"
+              rows="1"
+              placeholder="Escribe un mensaje o usa el micrófono..."
+              aria-label="Mensaje"
+              autocomplete="off"
+              spellcheck="true"
+            ></textarea>
+          </div>
+
+          <button id="sendBtn" aria-label="Enviar mensaje">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+              <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405Z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- File input oculto (solo imagen) -->
+        <input type="file" id="imageFileInput" accept="image/*" style="display:none" aria-hidden="true">
+
+        <div class="input-footer">
+          <span id="tokenInfo" aria-live="polite"></span>
+          <span class="input-disclaimer">Gemini Nano corre localmente en tu navegador</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ── Settings Modal ──────────────────────────────────────────────────────── -->
+  <div id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Configuración</h2>
+        <button id="settingsClose" aria-label="Cerrar configuración">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Temperature -->
+      <div class="setting-group">
+        <label class="setting-label" for="settingsTemp">
+          Temperature
+          <span class="setting-val" id="settingsTempVal">0.8</span>
+        </label>
+        <input type="range" id="settingsTemp" min="0" max="2" step="0.1" value="0.8" aria-label="Temperature">
+        <span class="setting-desc">Controla la creatividad. Valores bajos = más predecible, altos = más creativo.</span>
+      </div>
+
+      <!-- Top-K -->
+      <div class="setting-group">
+        <label class="setting-label" for="settingsTopK">
+          Top-K
+          <span class="setting-val" id="settingsTopKVal">40</span>
+        </label>
+        <input type="range" id="settingsTopK" min="1" max="128" step="1" value="40" aria-label="Top-K">
+        <span class="setting-desc">Número de tokens candidatos en cada paso de generación.</span>
+      </div>
+
+      <!-- System prompt -->
+      <div class="setting-group">
+        <label class="setting-label" for="settingsSysPrompt">Prompt del sistema</label>
+        <textarea
+          id="settingsSysPrompt"
+          class="setting-textarea"
+          placeholder="Ej: Eres un asistente experto en programación. Responde siempre en español y de forma concisa."
+          aria-label="Prompt del sistema"
+        ></textarea>
+        <span class="setting-desc">Instrucciones base que el modelo seguirá en toda la conversación.</span>
+      </div>
+
+      <!-- Setup info -->
+      <div class="setting-group">
+        <div class="setting-label">Activar Gemini Nano en Chrome</div>
+        <div class="setup-info">
+          <p><strong>1. Modelo base:</strong><br>
+          <code>chrome://flags/#optimization-guide-on-device-model</code> → <em>Enabled BypassPerfRequirement</em></p>
+          <p style="margin-top:8px"><strong>2. Prompt API:</strong><br>
+          <code>chrome://flags/#prompt-api-for-gemini-nano</code> → <em>Enabled</em></p>
+          <p style="margin-top:8px"><strong>3. Verificar en DevTools:</strong><br>
+          <code>await LanguageModel.availability()</code> → debe retornar <em>"available"</em></p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="settingsCancel" onclick="document.getElementById('settingsModal').classList.remove('open')">Cancelar</button>
+        <button class="btn btn-primary" id="settingsSave">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
