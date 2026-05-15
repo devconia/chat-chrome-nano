@@ -781,17 +781,7 @@ html, body {
   padding: 5px 8px;
   margin-left: auto;
 }
-.vb-discard:hover { color: var(--status-err); background: rgba(239,68,68,0.08); 
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  background: rgba(16,163,127,0.2);
-  color: var(--accent);
-  border-radius: 50%;
-  margin-right: 6px;
-  vertical-align: middle;
-  flex-shrink: 0;
-}
+.vb-discard:hover { color: var(--status-err); background: rgba(239,68,68,0.08); }
 
 /* ─── Settings Modal ────────────────────────────────────────────────────────── */
 #settingsModal {

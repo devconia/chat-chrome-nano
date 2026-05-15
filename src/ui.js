@@ -205,9 +205,15 @@ export function setRecordingState(recording) {
 }
 
 export function showInterimTranscript(interim, final) {
+  const bubble = $('voiceBubble');
   const liveEl = $('voiceBubbleLive');
   const textEl = $('voiceBubbleText');
   if (!liveEl || !textEl) return;
+
+  // Asegurar que el bubble esté visible
+  if (bubble && !bubble.classList.contains('visible')) {
+    bubble.classList.add('visible');
+  }
 
   // Texto confirmado en el área principal del bubble
   textEl.textContent = final;
@@ -215,8 +221,10 @@ export function showInterimTranscript(interim, final) {
   // Texto parcial (interim) en el área de vivo, en gris itálico
   if (interim) {
     liveEl.textContent = interim;
+  } else if (final) {
+    liveEl.textContent = '';
   } else {
-    liveEl.textContent = final ? '' : '🎙️ Escuchando...';
+    liveEl.textContent = '🎙️ Escuchando...';
   }
 }
 
@@ -236,6 +244,7 @@ export function showVoiceBubble(text, onEdit, onSend, onDiscard, liveMode = fals
   const bubble = $('voiceBubble');
   if (!bubble) return;
 
+  // IMPORTANTE: Always make the bubble visible when this function is called
   bubble.classList.add('visible');
 
   const liveEl   = $('voiceBubbleLive');
@@ -273,10 +282,18 @@ export function showVoiceBubble(text, onEdit, onSend, onDiscard, liveMode = fals
   if (onDiscard) newDiscard.addEventListener('click', () => { hideVoiceBubble(); onDiscard(); });
 }
 
-/** Oculta el bubble de voz. */
+/** Oculta el bubble de voz y resetea su contenido interno. */
 export function hideVoiceBubble() {
   const bubble = $('voiceBubble');
-  if (bubble) bubble.classList.remove('visible');
+  if (!bubble) return;
+  bubble.classList.remove('visible');
+
+  // Limpiar contenido para que no quede estado sucio al reabrir
+  const liveEl    = $('voiceBubbleLive');
+  const textEl    = $('voiceBubbleText');
+  if (liveEl) liveEl.textContent = '';
+  if (textEl) textEl.textContent = '';
+  // No tocamos actionsEl.style aquí — showVoiceBubble lo gestiona en cada modo
 }
 
 // ─── Sidebar helpers ──────────────────────────────────────────────────────────

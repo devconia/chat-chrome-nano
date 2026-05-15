@@ -93,8 +93,12 @@ function startRecording() {
     return;
   }
 
-  // Si hay un bubble anterior visible, lo cerramos y empezamos limpio
-  hideVoiceBubble();
+  // Si hay un bubble anterior visible, lo cerramos completamente y reseteamos el estado
+  const existingBubble = document.getElementById('voiceBubble');
+  if (existingBubble && existingBubble.classList.contains('visible')) {
+    // Resetear el estado interno del bubble (limpiar textos y acciones)
+    hideVoiceBubble();
+  }
 
   finalTranscript = '';
   voiceMessage = true;
@@ -102,8 +106,8 @@ function startRecording() {
   recognition = initSpeechRecognition();
   if (!recognition) return;
 
-  // Mostrar el bubble en modo "grabando" antes de que llegue el primer resultado
-  showVoiceBubble('', null, null, null, true); // modo live: sin acciones todavía
+  // Mostrar el bubble en modo live con el indicador de escucha
+  showVoiceBubble('', null, null, null, true);
 
   try {
     recognition.start();
